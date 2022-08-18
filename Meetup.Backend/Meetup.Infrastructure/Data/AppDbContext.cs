@@ -11,7 +11,9 @@ public class AppDbContext : IdentityDbContext<AuthUser>
     
     public DbSet<User> Users { get; set; }
     public DbSet<ApplicationUserRefreshTokens> RefreshTokens { get; set; }
-
+    public DbSet<Event> Events { get; set; }
+    public DbSet<Tag> Tags { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
