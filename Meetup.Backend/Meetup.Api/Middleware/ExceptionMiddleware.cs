@@ -1,6 +1,7 @@
 using System.Net;
 using Meetup.Api.Models;
 using Meetup.Core.Exceptions;
+using Meetup.Core.Logic.RefreshToken.Exceptions;
 using Meetup.Infrastructure.Identity.Exceptions;
 
 namespace Meetup.Api.Middleware;
@@ -53,6 +54,7 @@ public class ExceptionMiddleware
             UserNameIsTakenException => (int)HttpStatusCode.BadRequest,
             PasswordsAreNotEqualException => (int)HttpStatusCode.BadRequest,
             InvalidPasswordException => (int)HttpStatusCode.Unauthorized,
+            RefreshTokenException => (int)HttpStatusCode.BadRequest,
             /*UnauthorizedException => (int)HttpStatusCode.Unauthorized,
             ConfirmEmailException => (int)HttpStatusCode.BadRequest,
             ConfirmResetPasswordException => (int)HttpStatusCode.BadRequest,

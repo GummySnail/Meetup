@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Meetup.Core.Entities;
 using Meetup.Core.Exceptions;
+using Meetup.Core.Interfaces.Repositories;
 using Meetup.Core.Interfaces.Services;
 using Meetup.Infrastructure.Identity.Exceptions;
 using Meetup.Infrastructure.Identity.Response;
@@ -10,13 +11,15 @@ namespace Meetup.Infrastructure.Identity.Services;
 
 public class IdentityService
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IAuthUserRepository _userRepository;
     private readonly ITokenService _tokenService;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-    public IdentityService(IUserRepository userRepository, ITokenService tokenService)
+    public IdentityService(IAuthUserRepository userRepository, ITokenService tokenService, IRefreshTokenRepository refreshTokenRepository)
     {
         _userRepository = userRepository;
         _tokenService = tokenService;
+        _refreshTokenRepository = refreshTokenRepository;
     }
 
     public async Task<LoggedResponse> RegisterAsync(string email, string userName, string password,
@@ -97,6 +100,10 @@ public class IdentityService
             new Claim(ClaimTypes.Role, "User")
         });
 
-        return new LoggedResponse(authUser.Email, authUser.UserName, accessToken);
+        var refreshToken = _tokenService.GenerateRefreshToken();
+        await _refreshTokenRepository.AddRefreshTokenAsync(authUser.Id, refreshToken, DateTime.UtcNow.AddMonths(1));
+        await _refreshTokenRepository.SaveChangesAsync();
+        
+        return new LoggedResponse(authUser.Email, authUser.UserName, accessToken, refreshToken);
     }
 }

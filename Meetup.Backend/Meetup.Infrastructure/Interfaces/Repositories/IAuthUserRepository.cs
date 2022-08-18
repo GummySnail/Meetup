@@ -3,7 +3,7 @@ using Meetup.Infrastructure.Identity;
 
 namespace Meetup.Infrastructure.Interfaces.Repositories;
 
-public interface IUserRepository
+public interface IAuthUserRepository
 {
     Task<bool> IsUserExistByEmailAsync(string email);
     Task<bool> IsUserExistByUserNameAsync(string userName);

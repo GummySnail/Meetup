@@ -1,4 +1,5 @@
 using System.Text;
+using Meetup.Core.Interfaces.Repositories;
 using Meetup.Core.Interfaces.Services;
 using Meetup.Infrastructure.Data;
 using Meetup.Infrastructure.Data.Repositories;
@@ -73,8 +74,10 @@ public static class ConfigureInfrastructureServices
             opt.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
         });
 
+        services.AddScoped<IAuthUserRepository, AuthUserRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
-
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IdentityService>();
         
