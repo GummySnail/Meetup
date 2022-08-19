@@ -1,8 +1,8 @@
 using Meetup.Core.DTOs;
-using Meetup.Core.Entities;
 using Meetup.Core.Exceptions;
 using Meetup.Core.Interfaces.Repositories;
 using Meetup.Core.Logic.Event.Exceptions;
+using Meetup.Core.Logic.Event.Response;
 
 namespace Meetup.Core.Logic.Event;
 
@@ -17,11 +17,6 @@ public class EventService
 
     public async Task AddEventAsync(string name, string description, string city, DateTime startEvent, ICollection<TagDto> tagsDto, string ownerId)
     {
-        if (startEvent <= DateTime.UtcNow)
-        {
-            throw new StartEventException("Event start date error");
-        }
-
         if (await _eventRepository.AddEventAsync(name, description, city, startEvent, tagsDto, ownerId) == 0)
         {
             throw new SaveChangesToDbException("Can't save event");
@@ -31,9 +26,7 @@ public class EventService
     public async Task EditEventAsync(string? name, string? description, string? city, DateTime? startEvent,
         ICollection<TagDto>? tagsDto, string ownerId, string eventId)
     {
-        var @event = await _eventRepository.IsEventExistAsync(eventId);
-        
-        if (@event is null)
+        if (!await _eventRepository.IsEventExistAsync(eventId))
         {
             throw new NotFoundException($"Event with id '{eventId}' not found");
         }
@@ -43,6 +36,8 @@ public class EventService
             throw new EventOwnerException("Only owner can edit his event");
         }
 
+        var @event = await _eventRepository.GetEventByIdAsync(eventId);
+        
         if (await _eventRepository.UpdateEventAsync(@event, name, description, city, startEvent, tagsDto) == 0)
         {
             throw new SaveChangesToDbException("Can't update event");
@@ -51,9 +46,7 @@ public class EventService
 
     public async Task DeleteEventAsync(string ownerId, string eventId)
     {
-        var @event = await _eventRepository.IsEventExistAsync(eventId);
-        
-        if (@event is null)
+        if (!await _eventRepository.IsEventExistAsync(eventId))
         {
             throw new NotFoundException($"Event with id '{eventId}' not found");
         }
@@ -63,9 +56,30 @@ public class EventService
             throw new EventOwnerException("Only owner can delete his event");
         }
 
+        var @event = await _eventRepository.GetEventByIdAsync(eventId);
+        
         if (await _eventRepository.DeleteEventAsync(@event) == 0)
         {
-            
+            throw new SaveChangesToDbException("Can't delete event");
         }
+    }
+
+    public async Task<EventResponse> GetEventByIdAsync(string eventId)
+    {
+        if (!await _eventRepository.IsEventExistAsync(eventId))
+        {
+            throw new NotFoundException($"Event with id '{eventId}' not found");
+        }
+
+        var @event = await _eventRepository.GetEventByIdAsync(eventId);
+        
+        return _eventRepository.MappingToResponseEventModel(@event);
+    }
+
+    public async Task<ICollection<EventResponse>> GetEventsAsync(EventParams eventParams)
+    {
+        var events = await _eventRepository.GetEventsAsync(eventParams);
+
+        return _eventRepository.MappingToResponseListEventModel(events);
     }
 }

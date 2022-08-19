@@ -2,6 +2,7 @@ using AutoMapper;
 using AutoMapper.Configuration.Annotations;
 using Meetup.Core.DTOs;
 using Meetup.Core.Entities;
+using Meetup.Core.Logic.Event.Response;
 using Meetup.Infrastructure.Identity;
 
 namespace Meetup.Infrastructure.Mapping;
@@ -16,5 +17,7 @@ public class MapperProfile : Profile
         CreateMap<TagDto, Tag>()
             .ForMember(t => t.Id, opt => opt.Ignore());
         CreateMap<Tag, TagDto>();
+
+        CreateMap<Event, EventResponse>();
     }
 }

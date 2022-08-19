@@ -2,6 +2,8 @@ using AutoMapper;
 using Meetup.Core.DTOs;
 using Meetup.Core.Entities;
 using Meetup.Core.Interfaces.Repositories;
+using Meetup.Core.Logic;
+using Meetup.Core.Logic.Event.Response;
 using Microsoft.EntityFrameworkCore;
 
 namespace Meetup.Infrastructure.Data.Repositories;
@@ -43,9 +45,9 @@ public class EventRepository : IEventRepository
         return await _context.SaveChangesAsync();
     }
 
-    public async Task<Event?> IsEventExistAsync(string eventId)
+    public async Task<bool> IsEventExistAsync(string eventId)
     {
-       return await _context.Events.SingleOrDefaultAsync(ev => ev.Id == eventId);
+       return await _context.Events.AnyAsync(ev => ev.Id == eventId);
     }
 
     public async Task<bool> IsOwnerEvent(string ownerId)
@@ -70,9 +72,8 @@ public class EventRepository : IEventRepository
         @event.City = city;
         @event.StartEvent = startEvent.Value;
         @event.Tags = tags;
-
-        _context.Tags.RemoveRange(_context.Tags.Where(t => t.EventId == @event.Id));
-        _context.Events.UpdateRange(@event);
+        
+        _context.Events.Update(@event);
         return await _context.SaveChangesAsync();
     }
 
@@ -80,5 +81,43 @@ public class EventRepository : IEventRepository
     { 
         _context.Events.RemoveRange(@event);
         return await _context.SaveChangesAsync();
+    }
+
+    public async Task<Event> GetEventByIdAsync(string eventId)
+    {
+        return await _context.Events.Include(ev => ev.Tags).SingleOrDefaultAsync(ev => ev.Id == eventId);
+    }
+
+    public EventResponse MappingToResponseEventModel(Event @event)
+    {
+        return _mapper.Map<Event, EventResponse>(@event);
+    }
+
+    public ICollection<EventResponse> MappingToResponseListEventModel(PagedList<Event> events)
+    {
+        List<EventResponse> eventsList = new List<EventResponse>();
+
+        foreach (var @event in events)
+        {
+            eventsList.Add(_mapper.Map<Event, EventResponse>(@event));
+        }
+
+        return eventsList;
+    }
+
+    public async Task<PagedList<Event>> GetEventsAsync(EventParams eventParams)
+    {
+        var query = _context.Events
+            .Where(ev => ev.City.ToLower().Contains(eventParams.City.ToLower()))
+            .Where(ev => ev.Name.ToLower().Contains(eventParams.Name.ToLower()));
+
+        query = eventParams.OrderByDateTime switch
+        {
+            "Upcoming" => query.OrderBy(q => q.StartEvent).Include(ev => ev.Tags),
+            _ => query.OrderByDescending(q => q.StartEvent).Include(ev => ev.Tags)
+        };
+
+        return await PagedList<Event>
+            .CreateAsync(query, eventParams.PageNumber, eventParams.PageSize);
     }
 }
