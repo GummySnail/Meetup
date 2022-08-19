@@ -58,6 +58,7 @@ public class ExceptionMiddleware
             RefreshTokenException => (int)HttpStatusCode.BadRequest,
             StartEventException => (int)HttpStatusCode.BadRequest,
             SaveChangesToDbException => (int)HttpStatusCode.BadRequest,
+            EventOwnerException => (int)HttpStatusCode.BadRequest,
             _ => (int)HttpStatusCode.InternalServerError
         };
     }

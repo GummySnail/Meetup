@@ -1,8 +1,6 @@
 using Meetup.Api.Extensions;
 using Meetup.Api.Models.Event.Requests;
-using Meetup.Core.DTOs;
 using Meetup.Core.Logic.Event;
-using Meetup.Core.Logic.Event.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +22,21 @@ public class EventController : BaseApiController
         await _eventService.AddEventAsync(request.Name, request.Description, request.City, request.StartEvent, request.Tags, User.GetId());
         return NoContent();
     }
-    
-    /*[HttpGet]
-    public async Task<ActionResult<EventListResponse>> GetEvents([FromQuery] )*/
+
+    [Authorize]
+    [HttpPut("{id}")]
+    public async Task<ActionResult> UpdateEvent([FromBody] UpdateEventRequest request, string id)
+    {
+        await _eventService.EditEventAsync(request?.Name, request?.Description, request?.City, request?.StartEvent,
+            request?.Tags, User.GetId(), id);
+        return NoContent();
+    }
+
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteEvent(string id)
+    {
+        await _eventService.DeleteEventAsync(User.GetId(), id);
+        return NoContent();
+    }
 }
