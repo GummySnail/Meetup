@@ -8,8 +8,6 @@ namespace Meetup.Infrastructure.Data;
 
 public class DataSeeder
 {
-   // private static readonly IAuthUserRepository _authUserRepository;
-
     public static async Task SetApplicationRoleConfiguration(RoleManager<IdentityRole> roleManager)
     {
         if (await roleManager.Roles.AnyAsync()) return;
@@ -26,21 +24,14 @@ public class DataSeeder
         }
     }
 
-    /*public static async Task SetAdmin()
+    public async Task AddAdminAsync()
     {
-        var authUser = new AuthUser
+       /* var user = new AuthUser
         {
-            UserName = "Wendigo000",
-            Email = "wendigo_000.@mail.ru"
-        };
-
-        var user = new User
-        {
-            Id = authUser.Id,
-            UserName = "Wendigo000",
-            Email = "wendigo_000.@mail.ru"
-        };
-        
-        await _authUserRepository.CreateUserAsync(authUser, "pa$$w0rd", user, "Admin");
-    }*/
+            Id = Guid.NewGuid().ToString(),
+            Email = "admin@meetup.com",
+            UserName = "Admin",
+            
+        }*/
+    }
 }
