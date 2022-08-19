@@ -54,4 +54,12 @@ public class EventController : BaseApiController
     {
         return Ok(await _eventService.GetEventsAsync(eventParams));
     }
+
+    [Authorize]
+    [HttpPost("{id}")]
+    public async Task<ActionResult> SignUpForEvent(string id)
+    {
+        await _eventService.SignUpForEventAsync(User.GetId(), id);
+        return NoContent();
+    }
 }

@@ -31,7 +31,7 @@ public class EventService
             throw new NotFoundException($"Event with id '{eventId}' not found");
         }
 
-        if (!await _eventRepository.IsOwnerEvent(ownerId))
+        if (!await _eventRepository.IsOwnerEventAsync(ownerId))
         {
             throw new EventOwnerException("Only owner can edit his event");
         }
@@ -51,7 +51,7 @@ public class EventService
             throw new NotFoundException($"Event with id '{eventId}' not found");
         }
 
-        if (!await _eventRepository.IsOwnerEvent(ownerId))
+        if (!await _eventRepository.IsOwnerEventAsync(ownerId))
         {
             throw new EventOwnerException("Only owner can delete his event");
         }
@@ -81,5 +81,23 @@ public class EventService
         var events = await _eventRepository.GetEventsAsync(eventParams);
 
         return _eventRepository.MappingToResponseListEventModel(events);
+    }
+
+    public async Task SignUpForEventAsync(string userId, string eventId)
+    {
+        if (!await _eventRepository.IsEventExistAsync(eventId))
+        {
+            throw new NotFoundException($"Event with id '{eventId}' not found");
+        }
+
+        if (await _eventRepository.IsOwnerEventAsync(userId))
+        {
+            throw new EventOwnerException("Owners can't sign up to they events");
+        }
+
+        if (await _eventRepository.SignUpForEventAsync(userId, eventId) == 0)
+        {
+            throw new SaveChangesToDbException("Can't sign up for event");
+        }
     }
 }

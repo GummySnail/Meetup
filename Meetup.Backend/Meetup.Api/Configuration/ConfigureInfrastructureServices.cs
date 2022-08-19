@@ -22,16 +22,13 @@ public static class ConfigureInfrastructureServices
         services.AddDbContext<AppDbContext>(opt =>
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            string connectionString;
+            string connectionString = String.Empty;
 
             if (environment == "Development")
             {
                 connectionString = config.GetConnectionString("AppDbContextConnection");
             }
-            else
-            {
-                connectionString = "Take from db url";
-            }
+            
             opt.UseNpgsql(connectionString, x => x.MigrationsAssembly("Meetup.Infrastructure"));
         });
 
@@ -42,7 +39,7 @@ public static class ConfigureInfrastructureServices
                 opt.Password.RequireLowercase = false;
                 opt.Password.RequireUppercase = false;
                 opt.Password.RequireNonAlphanumeric = false;
-                //opt.User.RequireUniqueEmail = true;
+                opt.User.RequireUniqueEmail = true;
                 opt.SignIn.RequireConfirmedEmail = false;
             })
             .AddEntityFrameworkStores<AppDbContext>()

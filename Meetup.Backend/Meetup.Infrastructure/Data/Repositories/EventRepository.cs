@@ -50,7 +50,7 @@ public class EventRepository : IEventRepository
        return await _context.Events.AnyAsync(ev => ev.Id == eventId);
     }
 
-    public async Task<bool> IsOwnerEvent(string ownerId)
+    public async Task<bool> IsOwnerEventAsync(string ownerId)
     {
         return await _context.Events.AnyAsync(ev => ev.OwnerId == ownerId);
     }
@@ -61,11 +61,13 @@ public class EventRepository : IEventRepository
         var tags = new List<Tag>();
 
         if (tagsDto != null)
+        {
             foreach (var tagDto in tagsDto)
             {
                 var tag = new Tag { EventId = @event.Id };
                 tags.Add(_mapper.Map(tagDto, tag));
             }
+        }
 
         @event.Name = name;
         @event.Description = description;
@@ -119,5 +121,19 @@ public class EventRepository : IEventRepository
 
         return await PagedList<Event>
             .CreateAsync(query, eventParams.PageNumber, eventParams.PageSize);
+    }
+
+    public async Task<int> SignUpForEventAsync(string userId, string eventId)
+    {
+        var user = await _context.Users
+            .Where(u => u.Id == userId)
+            .Include(u => u.Events)
+            .FirstOrDefaultAsync();
+
+        var @event = await _context.Events.FindAsync(eventId);
+        
+        user.Events.Add(@event);
+        
+        return await _context.SaveChangesAsync();
     }
 }

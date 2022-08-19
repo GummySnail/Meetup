@@ -1,5 +1,4 @@
 using AutoMapper;
-using AutoMapper.Configuration.Annotations;
 using Meetup.Core.DTOs;
 using Meetup.Core.Entities;
 using Meetup.Core.Logic.Event.Response;
