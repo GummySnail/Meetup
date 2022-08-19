@@ -43,6 +43,7 @@ public static class ConfigureApplication
             await context.Database.MigrateAsync();
 
             await DataSeeder.SetApplicationRoleConfiguration(roleManager);
+            //await DataSeeder.SetAdmin();
         }
         catch (Exception ex)
         {

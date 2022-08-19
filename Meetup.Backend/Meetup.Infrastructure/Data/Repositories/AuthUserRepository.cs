@@ -27,10 +27,10 @@ public class AuthUserRepository : IAuthUserRepository
         return await _userManager.Users.AnyAsync(x => x.NormalizedUserName == userName.ToUpperInvariant());
     }
     
-    public async Task CreateUserAsync(AuthUser authUser, string password, User user)
+    public async Task CreateUserAsync(AuthUser authUser, string password, User user, string role = "User")
     {
         await _userManager.CreateAsync(authUser, password);
-        await _userManager.AddToRoleAsync(authUser, "User");
+        await _userManager.AddToRoleAsync(authUser, role);
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
     }

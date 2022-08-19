@@ -77,6 +77,7 @@ public static class ConfigureInfrastructureServices
         services.AddScoped<IAuthUserRepository, AuthUserRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IEventRepository, EventRepository>();
         
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IdentityService>();
