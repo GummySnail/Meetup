@@ -11,4 +11,5 @@ public interface IAuthUserRepository
     Task<AuthUser> GetUserByEmailAsync(string email);
     Task<AuthUser> GetUserByUserNameAsync(string userName);
     Task<bool> CheckPasswordAsync(AuthUser authUser, string password);
+    Task<IList<string>> TakeRolesAsync(AuthUser authUser);
 }

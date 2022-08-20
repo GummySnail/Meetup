@@ -23,7 +23,7 @@ public class EventService
         }
     }
 
-    public async Task EditEventAsync(string? name, string? description, string? city, DateTime? startEvent,
+    public async Task EditEventAsync(string name, string description, string city, DateTime startEvent,
         ICollection<TagDto>? tagsDto, string ownerId, string eventId)
     {
         if (!await _eventRepository.IsEventExistAsync(eventId))

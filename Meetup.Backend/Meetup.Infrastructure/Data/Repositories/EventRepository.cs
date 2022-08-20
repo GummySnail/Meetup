@@ -56,7 +56,7 @@ public class EventRepository : IEventRepository
     }
 
 
-    public async Task<int> UpdateEventAsync(Event @event, string? name, string? description, string? city, DateTime? startEvent, ICollection<TagDto>? tagsDto)
+    public async Task<int> UpdateEventAsync(Event @event, string name, string description, string city, DateTime startEvent, ICollection<TagDto>? tagsDto)
     {
         var tags = new List<Tag>();
 
@@ -72,7 +72,7 @@ public class EventRepository : IEventRepository
         @event.Name = name;
         @event.Description = description;
         @event.City = city;
-        @event.StartEvent = startEvent.Value;
+        @event.StartEvent = startEvent;
         @event.Tags = tags;
         
         _context.Events.Update(@event);

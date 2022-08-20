@@ -35,10 +35,11 @@ public static class ConfigureInfrastructureServices
         services.AddIdentity<AuthUser, IdentityRole>(opt =>
             {
                 opt.Password.RequiredLength = 8;
-                opt.Password.RequireDigit = false;
+                opt.Password.RequireDigit = true;
                 opt.Password.RequireLowercase = false;
-                opt.Password.RequireUppercase = false;
-                opt.Password.RequireNonAlphanumeric = false;
+                opt.Password.RequireUppercase = true;
+                opt.Password.RequireNonAlphanumeric = true;
+                opt.Password.RequiredUniqueChars = 0;
                 opt.User.RequireUniqueEmail = true;
                 opt.SignIn.RequireConfirmedEmail = false;
             })

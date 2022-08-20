@@ -49,4 +49,9 @@ public class AuthUserRepository : IAuthUserRepository
     {
         return await _userManager.CheckPasswordAsync(authUser, password);
     }
+
+    public async Task<IList<string>> TakeRolesAsync(AuthUser authUser)
+    {
+        return await _userManager.GetRolesAsync(authUser);
+    }
 }

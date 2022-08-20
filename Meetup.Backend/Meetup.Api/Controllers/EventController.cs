@@ -1,5 +1,4 @@
 using Meetup.Api.Extensions;
-using Meetup.Api.Models;
 using Meetup.Api.Models.Event.Requests;
 using Meetup.Core.Logic;
 using Meetup.Core.Logic.Event;
@@ -30,7 +29,7 @@ public class EventController : BaseApiController
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateEvent([FromBody] UpdateEventRequest request, string id)
     {
-        await _eventService.EditEventAsync(request?.Name, request?.Description, request?.City, request?.StartEvent,
+        await _eventService.EditEventAsync(request.Name, request.Description, request.City, request.StartEvent,
             request?.Tags, User.GetId(), id);
         return NoContent();
     }

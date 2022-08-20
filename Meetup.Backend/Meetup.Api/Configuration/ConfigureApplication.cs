@@ -1,6 +1,7 @@
 using Meetup.Api.Middleware;
 using Meetup.Infrastructure.Data;
 using Meetup.Infrastructure.Identity;
+using Meetup.Infrastructure.Interfaces.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,8 +24,6 @@ public static class ConfigureApplication
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-        app.UseDefaultFiles();
-        app.UseStaticFiles();
 
         return app;
     }
@@ -43,7 +42,8 @@ public static class ConfigureApplication
             await context.Database.MigrateAsync();
 
             await DataSeeder.SetApplicationRoleConfiguration(roleManager);
-            //await DataSeeder.SetAdmin();
+            await DataSeeder.AddAdminAsync(services.GetRequiredService<IAuthUserRepository>());
+            await DataSeeder.AddUsersAsync(services.GetRequiredService<IAuthUserRepository>());
         }
         catch (Exception ex)
         {

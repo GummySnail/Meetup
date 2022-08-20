@@ -1,7 +1,6 @@
 using Meetup.Api.Models.Auth.Requests;
 using Meetup.Infrastructure.Identity.Response;
 using Meetup.Infrastructure.Identity.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Meetup.Api.Controllers;

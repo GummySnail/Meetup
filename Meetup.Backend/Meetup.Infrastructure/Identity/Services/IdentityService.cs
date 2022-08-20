@@ -55,7 +55,9 @@ public class IdentityService
 
         await _userRepository.CreateUserAsync(authUser, password, user);
         
-        return await ReturnAuthorizedUser(authUser);
+        var role = await GetRoleAsync(authUser);
+        
+        return await ReturnAuthorizedUser(authUser, role);
     }
 
     public async Task<LoggedResponse> LoginByEmailAsync(string email, string password)
@@ -72,7 +74,9 @@ public class IdentityService
             throw new InvalidPasswordException("Invalid password");
         }
 
-        return await ReturnAuthorizedUser(user);
+        var role = await GetRoleAsync(user);
+        
+        return await ReturnAuthorizedUser(user, role);
     }
 
     public async Task<LoggedResponse> LoginByUserNameAsync(string userName, string password)
@@ -88,16 +92,18 @@ public class IdentityService
         {
             throw new InvalidPasswordException("Invalid password");
         }
-
-        return await ReturnAuthorizedUser(user);
+        
+        var role = await GetRoleAsync(user);
+        
+        return await ReturnAuthorizedUser(user, role);
     }
 
-    private async Task<LoggedResponse> ReturnAuthorizedUser(AuthUser authUser)
+    private async Task<LoggedResponse> ReturnAuthorizedUser(AuthUser authUser, string role)
     {
         var accessToken = _tokenService.GenerateAccessToken(new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, authUser.Id),
-            new Claim(ClaimTypes.Role, "User")
+            new Claim(ClaimTypes.Role, role)
         });
 
         var refreshToken = _tokenService.GenerateRefreshToken();
@@ -105,5 +111,17 @@ public class IdentityService
         await _refreshTokenRepository.SaveChangesAsync();
         
         return new LoggedResponse(authUser.Email, authUser.UserName, accessToken, refreshToken);
+    }
+
+    private async Task<string> GetRoleAsync(AuthUser authUser)
+    {
+        var roles = await _userRepository.TakeRolesAsync(authUser);
+        
+        if (roles.Contains("Admin"))
+        {
+            return "Admin";
+        }
+
+        return "User";
     }
 }

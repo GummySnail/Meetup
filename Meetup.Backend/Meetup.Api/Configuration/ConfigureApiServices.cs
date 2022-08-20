@@ -1,4 +1,7 @@
+using FluentValidation.AspNetCore;
+using Meetup.Api.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 
 namespace Meetup.Api.Configuration;
@@ -8,7 +11,10 @@ public static class ConfigureApiServices
     public static IServiceCollection AddApiServices(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
-        services.AddControllers();
+        services.AddControllers(opt =>
+        {
+            opt.Filters.Add<ValidationFilter>();
+        });
         services.AddCors();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(setup =>
@@ -38,8 +44,14 @@ public static class ConfigureApiServices
             });
 
         });
+        services.AddFluentValidation(opt =>
+        {
+            opt.RegisterValidatorsFromAssembly(typeof(Program).Assembly);
+        });
+        
         services.Configure<RouteOptions>(opt => opt.LowercaseUrls = true);
-
+        services.Configure<ApiBehaviorOptions>(opt => opt.SuppressModelStateInvalidFilter = true);
+        
         return services;
     }
 }
